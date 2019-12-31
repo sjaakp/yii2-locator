@@ -1,0 +1,52 @@
+
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
+import buble from '@rollup/plugin-buble';
+import {terser} from 'rollup-plugin-terser';
+import {version} from './package.json';
+
+const appName = 'Locator';
+const year = new Date().getFullYear();
+
+const banner = `
+/*!
+ * ${appName} ${version}
+ * (c) ${year} Sjaak Priester, Amsterdam
+ * MIT License
+ * https://github.com/sjaakp/yii2-locator
+ * https://sjaakpriester.nl
+ */
+`;
+
+export default {
+    input: 'src/index.js',
+    output: {
+        file: 'assets/locator.js',
+        format: 'iife',
+        name: appName,
+        sourcemap: true,
+        banner: banner,
+    },
+    plugins: [
+        resolve({
+            customResolveOptions: {
+                moduleDirectory: 'node_modules'
+            }
+        }),
+        commonjs(),
+        json(),
+        buble({
+             transforms: {
+                 modules: false,
+                 dangerousForOf: true,
+                 dangerousTaggedTemplateString: true
+             }
+        }),
+        terser({
+            output: {
+                 comments: /^!/
+            }
+        })
+    ],
+};

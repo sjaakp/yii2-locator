@@ -1,0 +1,23 @@
+{
+    "name": "sjaakp/yii2-locator",
+    "description": "Leaflet-wrapper for Yii2.x",
+    "keywords": ["yii", "yii2", "extension", "widget", "leaflet", "map", "geo"],
+    "type": "yii2-extension",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sjaak Priester",
+            "email": "sjaak@sjaakpriester.nl",
+            "homepage": "https://sjaakpriester.nl"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "sjaakp\\locator\\": ""
+        }
+    }
+}
