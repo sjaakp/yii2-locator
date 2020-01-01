@@ -13,10 +13,6 @@
 L.Map.include({
 
     find: function(address) {
-        return this.findNominatim(address);
-    },
-
-    findNominatim: function(address) {
         const server = '//nominatim.openstreetmap.org/search';
         let map = this,
             req1 = new XMLHttpRequest();

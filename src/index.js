@@ -39,6 +39,9 @@
     Marker, CircleMarker, DotMarker, SpriteMarker each have extra options
         monitor     String, the id of a HTML text input updated at moveend
         title       HTML of tooltip
+
+    @link https://leafletjs.com/
+    @link http://www.liedman.net/tiled-maps/ - The Hitchhacker’s Guide To Tiled Maps
  */
 
 import './touchdrag.js';

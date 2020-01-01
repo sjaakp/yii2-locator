@@ -20,6 +20,10 @@ use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
+/**
+ * Class Locator
+ * @package sjaakp\locator
+ */
 class Locator extends Widget   {
     /**
      * @var int | string | false
@@ -117,26 +121,26 @@ class Locator extends Widget   {
             'minZoom' => 1
         ],
         'Carto' => [    // @link https://github.com/CartoDB/basemap-styles
-            'url' => '//cartodb-basemaps-{s}.global.ssl.fastly.net/{flavor:light_all}/{z}/{x}/{y}.png',
+            'url' => '//cartodb-basemaps-{s}.global.ssl.fastly.net/{scheme:light_all}/{z}/{x}/{y}.png',
             'attribution' => '{OpenStreetMap.attribution} &copy; <a href="//carto.com/attribution/" target="_blank">Carto</a>',
             'subdomains' => 'abcd',
             'maxZoom' => 20,
             'variants' => [
-                'light' => [ 'flavor' => 'light_all'],
-                'dark' => [ 'flavor' => 'dark_all'],
-                'voyager' => [ 'flavor' => 'rastertiles/voyager'],
+                'light' => [ 'scheme' => 'light_all'],
+                'dark' => [ 'scheme' => 'dark_all'],
+                'voyager' => [ 'scheme' => 'rastertiles/voyager'],
             ]
         ],
         'OpenMapSurfer' => [
-            'url' => '//maps.heigit.org/openmapsurfer/tiles/{flavor:roads}/webmercator/{z}/{x}/{y}.png',
+            'url' => '//maps.heigit.org/openmapsurfer/tiles/{scheme:roads}/webmercator/{z}/{x}/{y}.png',
             'maxZoom' => 19,
             'attribution' => 'Imagery from <a href="//giscience.uni-hd.de/" target="_blank">GIScience Research Group @ University of Heidelberg</a> | Map data',
             'variants' => [
-                'Roads' => [ 'flavor' => 'roads' ],
-                'Hybrid' => [ 'flavor' => 'hybrid' ],
-                'AdminBounds' => [ 'flavor' => 'adminb' ],
-                'ContourLines' => [ 'flavor' => 'asterc' ],
-                'Hillshade' => [ 'flavor' => 'asterh' ],
+                'Roads' => [ 'scheme' => 'roads' ],
+                'Hybrid' => [ 'scheme' => 'hybrid' ],
+                'AdminBounds' => [ 'scheme' => 'adminb' ],
+                'ContourLines' => [ 'scheme' => 'asterc' ],
+                'Hillshade' => [ 'scheme' => 'asterh' ],
             ]
         ],
         'OpenTopoMap' => [ // @link https://opentopomap.org/about#verwendung
@@ -146,37 +150,68 @@ class Locator extends Widget   {
             'attribution' => '{OpenStreetMap.attribution}, <a href="//viewfinderpanoramas.org" target="_blank">SRTM</a> | Map style: &copy; <a href="//opentopomap.org" target="_blank">OpenTopoMap</a> (<a href="//creativecommons.org/licenses/by-sa/3.0/" target="_blank">CC-BY-SA</a>)',
         ],
         'Stamen' => [
-            'url' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/{flavor:toner}/{z}/{x}/{y}.{ext:png}',
+            'url' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/{scheme:toner}/{z}/{x}/{y}.{ext:png}',
             'attribution' => 'Map tiles by <a href="//stamen.com" target="_blank">Stamen Design</a>, <a href="//creativecommons.org/licenses/by/3.0" target="_blank">CC BY 3.0</a> &mdash; Map data {OpenStreetMap.attribution}',
             'minZoom' => '{minZ:0}',
             'maxZoom' => '{maxZ:20}',
             'subdomains' => 'abcd',
             'variants' => [
-                'Toner' => [ 'flavor' => 'toner' ],
-                'TonerBackground' => [ 'flavor' => 'toner-background' ],
-                'TonerHybrid' => [ 'flavor' => 'toner-hybrid' ],
-                'TonerLines' => [ 'flavor' => 'toner-lines' ],
-                'TonerLabels' => [ 'flavor' => 'toner-labels' ],
-                'TonerLite' => [ 'flavor' => 'toner-lite' ],
-                'Watercolor' => [ 'flavor' => 'watercolor', 'ext' => 'jpg', 'minZ' => 1, 'maxZ' => 16  ],
-                'Terrain' => [ 'flavor' => 'terrain', 'maxZ' => 18  ],
-                'TerrainBackground' => [ 'flavor' => 'terrain-background', 'maxZ' => 18  ],
-                'TerrainLabels' => [ 'flavor' => 'terrain-labels', 'maxZ' => 18  ],
+                'Toner' => [ 'scheme' => 'toner' ],
+                'TonerBackground' => [ 'scheme' => 'toner-background' ],
+                'TonerHybrid' => [ 'scheme' => 'toner-hybrid' ],
+                'TonerLines' => [ 'scheme' => 'toner-lines' ],
+                'TonerLabels' => [ 'scheme' => 'toner-labels' ],
+                'TonerLite' => [ 'scheme' => 'toner-lite' ],
+                'Watercolor' => [ 'scheme' => 'watercolor', 'ext' => 'jpg', 'minZ' => 1, 'maxZ' => 16  ],
+                'Terrain' => [ 'scheme' => 'terrain', 'maxZ' => 18  ],
+                'TerrainBackground' => [ 'scheme' => 'terrain-background', 'maxZ' => 18  ],
+                'TerrainLabels' => [ 'scheme' => 'terrain-labels', 'maxZ' => 18  ],
             ]
         ],
         'TomTom' => [   // use: tileLayer([ 'TomTom', 'apiKey' => '... your Api Key ...' ])
-            'url' => 'https://{s}.api.tomtom.com/map/1/tile/{flavor:basic}/main/{z}/{x}/{y}.png?key=<apiKey>',
+                        // @link https://developer.tomtom.com/maps-api
+            'url' => 'https://{s}.api.tomtom.com/map/1/tile/{scheme:basic}/main/{z}/{x}/{y}.png?key=<apiKey>',
             'maxZoom' => 22,
             'subdomains' => 'abcd',
-            'attribution' => '<a href="https://tomtom.com" target="_blank">&copy;  1992-2020 TomTom.</a>',
+            'attribution' => '<a href="//tomtom.com" target="_blank">&copy;  1992-2020 TomTom.</a>',
             'variants' => [
-                'Basic' => [ 'flavor' => 'basic' ],
-                'Hybrid' => [ 'flavor' => 'hybrid' ],
-                'Labels' => [ 'flavor' => 'labels' ],
+                'Basic' => [ 'scheme' => 'basic' ],
+                'Hybrid' => [ 'scheme' => 'hybrid' ],
+                'Labels' => [ 'scheme' => 'labels' ],
             ],
         ],
+        'Here' => [ // use: tileLayer([ 'Here', 'apiKey' => '... your Api Key ...', 'language' => 'eng' ])
+                    // @link https://developer.here.com/documentation/map-tile/dev_guide/topics/request-constructing.html
+            'url' => 'https://{s}.{base:base}.maps.ls.hereapi.com/maptile/2.1/{resource:maptile}/newest/{scheme:normal.day}/{z}/{x}/{y}/256/png?apiKey=<apiKey>&lg=<language>',
+            'maxZoom' => 20,
+            'subdomains' => '1234',
+            'attribution' => 'Map &copy; 1987-2020 <a href="//developer.here.com" target="_blank">HERE</a>',
+            'variants' => [
+                'NormalDay' => [ 'scheme' => 'normal.day' ],
+                'NormalDayGrey' => [ 'scheme' => 'normal.day.grey' ],
+                'NormalDayTransit' => [ 'scheme' => 'normal.day.transit' ],
+                'NormalDayTraffic' => [ 'scheme' => 'normal.traffic.day', 'base' => 'traffic', 'resource' => 'traffictile' ],
+                'NormalNight' => [ 'scheme' => 'normal.night' ],
+                'NormalNightGrey' => [ 'scheme' => 'normal.night.grey' ],
+                'NormalNightTransit' => [ 'scheme' => 'normal.night.transit' ],
+                'NormalNightTraffic' => [ 'scheme' => 'normal.traffic.night', 'base' => 'traffic', 'resource' => 'traffictile' ],
+                'ReducedDay' => [ 'scheme' => 'reduced.day' ],
+                'ReducedNight' => [ 'scheme' => 'reduced.night' ],
+                'BasicMap' => [ 'resource' => 'basetile' ],
+                'MapLabels' => [ 'resource' => 'labeltile' ],
+                'TrafficFlow' => [ 'base' => 'traffic', 'resource' => 'flowtile' ],
+                'HybridDay' => [ 'base' => 'aerial', 'scheme' => 'hybrid.day' ],
+                'HybridDayGrey' => [ 'base' => 'aerial', 'scheme' => 'hybrid.grey.day' ],
+                'HybridDayTransit' => [ 'base' => 'aerial', 'scheme' => 'hybrid.day.transit' ],
+                'HybridDayTraffic' => [ 'base' => 'traffic', 'scheme' => 'hybrid.traffic.day', 'resource' => 'traffictile' ],
+                'PedestrianDay' => [ 'scheme' => 'pedestrian.day' ],
+                'PedestrianNight' => [ 'scheme' => 'pedestrian.night' ],
+                'SatelliteDay' => [ 'base' => 'aerial', 'scheme' => 'satellite.day' ],
+                'TerrainDay' => [ 'base' => 'aerial', 'scheme' => 'terrain.day' ],
+            ]
+        ],
         'Kadaster' => [   // Netherlands
-            'url' => '//geodata.nationaalgeoregister.nl/tiles/service/tms/1.0.0/brtachtergrondkaart{flavor:}/EPSG:3857/{z}/{x}/{y}.png',
+            'url' => '//geodata.nationaalgeoregister.nl/tiles/service/tms/1.0.0/brtachtergrondkaart{scheme:}/EPSG:3857/{z}/{x}/{y}.png',
             'tms' => true,
             'zoomOffset' => -1,
             'minZoom' => 7,
@@ -184,20 +219,20 @@ class Locator extends Widget   {
             'boundVec' => [[50.5, 0.0], [54, 10.4]],
             'attribution' => '&copy; <a href="//kadaster.nl" target="_blank">Kadaster</a><span class="printhide">, (<a href="//creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>)</span>.',
             'variants' => [
-                'grijs' => [ 'flavor' => 'grijs' ],
-                'pastel' => [ 'flavor' => 'pastel' ],
+                'grijs' => [ 'scheme' => 'grijs' ],
+                'pastel' => [ 'scheme' => 'pastel' ],
             ]
         ],
         'Amsterdam' => [
-            'url' => '//t{s}.data.amsterdam.nl/topo_wm{flavor:}/{z}/{x}/{y}.png',
+            'url' => '//t{s}.data.amsterdam.nl/topo_wm{scheme:}/{z}/{x}/{y}.png',
             'minZoom' => 11,
             'maxZoom' => 21,
             'boundVec' => [[52.1698, 4.48663], [52.6135, 5.60867]],
             'subdomains' => '1234',
             'attribution' => '&copy; <a href="//map.data.amsterdam.nl/" target="_blank">amsterdam.nl</a>',
             'variants' => [
-                'light' => [ 'flavor' => '_light' ],
-                'zw' => [ 'flavor' => '_zw' ],
+                'light' => [ 'scheme' => '_light' ],
+                'zw' => [ 'scheme' => '_zw' ],
             ]
         ],
     ];
@@ -227,10 +262,10 @@ class Locator extends Widget   {
                 }
                 foreach ($data as $key => $val) {
                     if (is_numeric($val) || is_string($val))   {
-                        $rep = preg_replace_callback('/{(\w+):(\w*)}/', function($m) use($variantData) {
+                        $rep = preg_replace_callback('/{(\w+):([\w.]*)}/', function($m) use($variantData) {
                             return $variantData[$m[1]] ?? $m[2];
                         }, $val);
-                        $data[$key] = is_numeric($val) ? $rep + 0 : $rep;
+                        $data[$key] = in_array($key, [ 'minZoom', 'maxZoom', 'zoomOffset' ]) ? $rep + 0 : $rep;
                     }
                 }
             }
