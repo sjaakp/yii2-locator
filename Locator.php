@@ -50,28 +50,45 @@ class Locator extends Widget   {
     public $leafletOptions = [];
 
     /**
-     * @var bool whether to use MarkerClusterer
+     * @var null|array options for MarkerClusterer
+     * if null: no clustering
+     * [] (empty array): cluster with default options
+     * @link https://github.com/Leaflet/Leaflet.markercluster#options
      */
-    public $cluster = false;
+    public $cluster;
 
     /**
-     * @var null|int
-     *  - null: no scale
-     *  - 1: metric only
-     *  - 2: imperial
-     *  - 3: metric + imperial
+     * @var null|array options for popup
+     * if null: no popup
+     * [] (empty array): popup with default options
+     * popup has one extra option:
+     *      - 'loading': the HTML shown while loading; default: '<i class="far fa-spinner fa-spin fa-lg"></i>'
+     * @link https://leafletjs.com/reference-1.6.0.html#popup-option
      */
-    public $scale = 1;
+    public $popup;
+
+    const SCALE_METRIC = 1;
+    const SCALE_IMPERIAL = 2;
+    const SCALE_BOTH = self::SCALE_METRIC | self::SCALE_IMPERIAL;
 
     /**
-     * @var string url jumped to when marker is clicked. If not set, no jump is performed.
+     * @var null|int SCALE_xxx
+     * display scale control; null: no scale
+     * @link https://leafletjs.com/reference-1.6.0.html#control-scale
+     */
+    public $scale = self::SCALE_METRIC;
+
+    /**
+     * @var string template for url used when marker is clicked.
+     *  If popup is set, popup is shown with contents from url, otherwise jump is performed to url.
+     *  If not set, nothing happens after marker click.
      *  '{xxx}' gets replaced by Marker option <xxx>
-     *  typical use: viewUrl = 'view/{id}'
+     *  typical use: urlTemplate = 'view/{id}'
      */
-    public $viewUrl;
+    public $urlTemplate;
 
     /**
-     * @var
+     * @var array options for default marker
      */
     public $marker = [ 'type' => 'DotMarker' ];
 
@@ -451,6 +468,10 @@ class Locator extends Widget   {
 
         Html::addCssClass($this->options, 'locator');
 
+        if (is_array($this->popup) && ! isset($this->popup['loading'])) {
+            $this->popup['loading'] = '<i class="fas fa-spinner fa-spin fa-lg"></i>';
+        }
+
         if ($this->height !== false) {
             $style = '';
             if (isset($this->options['style']))
@@ -468,7 +489,7 @@ class Locator extends Widget   {
         $view = $this->getView();
         $asset = LeafletAsset::register($view);
 
-        if ($this->cluster)    {
+        if (! is_null($this->cluster))    {
             $pop = array_pop($asset->js);       // ensure our js comes after markercluster.js
             $asset->js[] = '//unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js';
             array_push($asset->js, $pop);
@@ -479,12 +500,12 @@ class Locator extends Widget   {
         $id = $this->getId();
         $var = 'locator' . str_replace('-', '_', $id);
 
-        foreach([ 'marker', 'cluster', 'scale', 'viewUrl' ] as $prop)
+        foreach([ 'marker', 'cluster', 'popup', 'scale', 'urlTemplate' ] as $prop)
         {
             $this->leafletOptions[$prop] = $this->$prop;
         }
 
-        $opts = Json::encode(array_merge($this->defaultOptions, $this->leafletOptions));
+        $opts = str_replace('[]', '{}', Json::encode(array_merge($this->defaultOptions, $this->leafletOptions)));
         $call = "window.$var=L.map('$id', $opts)";
         array_unshift($this->_js, $call);
 

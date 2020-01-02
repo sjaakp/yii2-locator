@@ -19,15 +19,14 @@
         marker      Plain object, options used for creating markers
                         the option 'type' determines the type of marker (Marker, CircleMarker, DotMarker, SpriteMarker)
                         the option 'icon' is a plain object with options to create the icon for a regular Marker (i.e. not the icon itself)
-        viewUrl     String, url jumped to when marker is clicked. If not set, no jump is performed.
+        urlTemplate     String, url jumped to or used to get popup contents when marker is clicked. If not set, no jump is performed.
                         '{xxx}' gets replaced by Marker option <xxx>
-                        typical use: viewUrl = '/view/{id}'
-        cluster     Boolean. Whether MarkerClusterer is used.
+                        typical use: urlTemplate = '/view/{id}'
+        cluster     null|object. MarkerClusterer options; null: no clusters.
+        popup       null|object. Popup options; null: no popups.
         touchdrag   Boolean. If true, map can only be panned with two fingers; warning overlay appears if attempted with one finger.
                         Intended to avoid conflict with page scrolling on small devices.
         scale       null: no scale | 1: metric scale | 2: imperial scale | 3: both.
-
-    Map always has a scale control with a metric scale
 
     Two new classes:
 
@@ -62,8 +61,19 @@ L.Map.addInitHook(function() {
 
 L.Map.include({
 
-    _geo: null,
+    _markers: null,
     _armed: false,      // true if click on map produces a marker
+
+    getMarkers: function()  {
+        if (! this._markers)    {
+            if (this.options.cluster !== null)  {
+                this._markers = L.markerClusterGroup(this.options.cluster);
+                this.addLayer(this._markers);
+            }
+            else this._markers = this;
+        }
+        return this._markers;
+    },
 
     arm: function(markerOpts) {       // prepare for marker on click
         if (! this._armed)  {
@@ -87,29 +97,12 @@ L.Map.include({
         return this;
     },
 
-    getGeo: function()  {
-        if (! this._geo)    {
-            let geo = L.geoJSON(null, {
-                    pointToLayer: function(ft, latlng) {
-                        let r = this.newMarker(latlng, Object.assign({}, this.options.marker, ft.properties)),
-                            title = ft.properties.title;
-                        if (title) r.bindTooltip(title);
-                        return r;
-                    }.bind(this),
-                }),
-                clusters = geo;
-            if (this.options.cluster)   {
-                clusters = L.markerClusterGroup();
-                clusters.addLayer(geo);
-            }
-            this.addLayer(clusters);
-            this._geo = geo;
-        }
-        return this._geo;
-    },
-
     addFeature: function(feature)   {
-        this.getGeo().addData(feature);
+        this.getMarkers().addLayer(L.geoJSON(feature, {
+            pointToLayer: function (ft, latlng) {
+                return this.newMarker(latlng, Object.assign({}, this.options.marker, ft.properties));
+            }.bind(this),
+        }));
         return this;
     },
 
@@ -140,17 +133,34 @@ L.Map.include({
                 document.getElementById(id).value = JSON.stringify(e.target.toGeoJSON());
             }
         }).on('click', function (e)    {
-            let url = this._map.options.viewUrl;
+            let url = this.options.urlTemplate;
             if (url)  {
                 let matches = url.match(/{\w+}/g);
                 if (matches)    {
                     matches.forEach(function(match) {
-                        url = url.replace(match, this.options[match.slice(1, -1)]);
+                        url = url.replace(match, e.target.options[match.slice(1, -1)]);
                     }, this);
                 }
-                window.location = url;
+                if (this.options.popup !== null)   {
+                    let pOpts = this.options.popup,
+                        popup = L.popup(pOpts).setLatLng(e.latlng).setContent(pOpts.loading).openOn(this);
+
+                    let request = new XMLHttpRequest();
+                    request.open('GET', url, true);
+
+                    request.onload = function() {
+                        if (this.status >= 200 && this.status < 400) {
+                            popup.setContent(this.response);
+                        }
+                    };
+                    request.send();
+                }
+                else    {
+                    window.location = url;
+                }
             }
-        });
+        }, this);   // context = map
+
         if (options.title)  {
             r.bindTooltip(options.title);
         }
