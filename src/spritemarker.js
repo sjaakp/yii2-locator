@@ -19,7 +19,7 @@ L.SpriteMarker = L.Marker.extend({
      * - 'className': HTML class of DIV. Notice: *not* 'class'. @link https://leafletjs.com/reference-1.6.0.html#divicon-classname
      * Use this to display FontAwesome markers like so: 'className': 'far fa-2x fa-dog'; leave 'html' unset.
      */
-    initialize: function(latlng, options) {
+    initialize(latlng, options) {
         let cl = options.className ? options.className + ' ' : '';
         options.icon = L.divIcon({
             html: options.html || false,

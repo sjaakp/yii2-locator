@@ -17,7 +17,7 @@ L.DotMarker = L.CircleMarker.extend({
      * @param options options for the DotMarker:
      * - 'className': HTML class of underlying SVG <path>. Notice: *not* 'class'. @link https://leafletjs.com/reference-1.6.0.html#path
      */
-    initialize: function(latlng, options) {
+    initialize(latlng, options) {
         let cl = options.className ? options.className + ' ' : '';
         L.CircleMarker.prototype.initialize.call(this, latlng, Object.assign(options, {
             radius: 8,

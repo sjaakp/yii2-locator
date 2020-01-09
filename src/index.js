@@ -3,7 +3,7 @@
  * ----------
  * Leaflet wrapper for Yii2 framework
  * Version 1.0.0
- * Copyright (c) 2019
+ * Copyright (c) 2020
  * Sjaak Priester, Amsterdam
  * MIT License
  * https://github.com/sjaakp/yii2-locator
@@ -46,11 +46,11 @@
 import './touchdrag.js';
 import './dotmarker.js';
 import './spritemarker.js';
-import './find.js';
+import './geo.js';
 
 L.Map.addInitHook(function() {
     if (this.options.scale !== null) {
-        let s = this.options.scale,
+        const s = this.options.scale,
             metric = s & 1,
             imperial = s & 2;
         this.addControl(L.control.scale({ metric: metric, imperial: imperial }));    // add scale control
@@ -64,7 +64,7 @@ L.Map.include({
     _markers: null,
     _armed: false,      // true if click on map produces a marker
 
-    getMarkers: function()  {
+    getMarkers()  {
         if (! this._markers)    {
             if (this.options.cluster !== null)  {
                 this._markers = L.markerClusterGroup(this.options.cluster);
@@ -75,7 +75,7 @@ L.Map.include({
         return this._markers;
     },
 
-    arm: function(markerOpts) {       // prepare for marker on click
+    arm(markerOpts) {       // prepare for marker on click
         if (! this._armed)  {
             L.DomUtil.addClass(this.getContainer(), 'locator-armed');
             this.options.marker = markerOpts;
@@ -88,7 +88,7 @@ L.Map.include({
         return this;
     },
 
-    disarm: function() {
+    disarm() {
         if (this._armed)    {
             L.DomUtil.removeClass(this.getContainer(), 'locator-armed');
             this.off('click');
@@ -97,22 +97,22 @@ L.Map.include({
         return this;
     },
 
-    addFeature: function(feature)   {
+    addFeature(feature)   {
         this.getMarkers().addLayer(L.geoJSON(feature, {
-            pointToLayer: function (ft, latlng) {
+            pointToLayer: function(ft, latlng) {
                 return this.newMarker(latlng, Object.assign({}, this.options.marker, ft.properties));
             }.bind(this),
         }));
         return this;
     },
 
-    monitorZoom: function(id) {
+    monitorZoom(id) {
         return this.on('zoomend', function(e) {
             document.getElementById(id).value = e.target.getZoom();
         }).fire('zoomend');
     },
 
-    monitorCenter: function(id) {
+    monitorCenter(id) {
         return this.on('moveend', function(e) {
             const c = e.target.getCenter();
             document.getElementById(id).value = JSON.stringify({
@@ -122,13 +122,13 @@ L.Map.include({
         }).fire('moveend');
     },
 
-    newMarker: function(latlng, options) {      // create a new marker of any type
-        let type = options.type || 'Marker';
+    newMarker(latlng, options) {      // create a new marker of any type
+        const type = options.type || 'Marker';
         if (type === 'Marker' && options.icon)  {
             options.icon = L.icon(options.icon);
         }
         let r = new L[type](latlng, options).on('moveend', function(e) {
-            let id = e.target.options.monitor;
+            const id = e.target.options.monitor;
             if (id) {
                 document.getElementById(id).value = JSON.stringify(e.target.toGeoJSON());
             }
@@ -142,18 +142,12 @@ L.Map.include({
                     }, this);
                 }
                 if (this.options.popup !== null)   {
-                    let pOpts = this.options.popup,
+                    const pOpts = this.options.popup,
                         popup = L.popup(pOpts).setLatLng(e.latlng).setContent(pOpts.loading).openOn(this);
 
-                    let request = new XMLHttpRequest();
-                    request.open('GET', url, true);
-
-                    request.onload = function() {
-                        if (this.status >= 200 && this.status < 400) {
-                            popup.setContent(this.response);
-                        }
-                    };
-                    request.send();
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => popup.setContent(html));
                 }
                 else    {
                     window.location = url;
@@ -167,21 +161,27 @@ L.Map.include({
         return r;
     },
 
-    addMarker: function(latlng, markerOpts)  {
-        let m = this.newMarker(latlng, markerOpts);
+    addMarker(latlng, markerOpts)  {
+        const m = this.newMarker(latlng, markerOpts);
         this.addLayer(m);
         this._marker = m;
         m.fire('moveend');
         return this;
     },
 
-    placeMarker: function(latlng)   {
+    placeMarker(latlng, bbox)   {
         if (this._marker)    {
             this._marker.setLatLng(latlng);
         }
         else {
-            this.unarm().addMarker(latlng, this.options.marker);
+            this.disarm().addMarker(latlng, this.options.marker);
         }
-        this.panTo(latlng);
+        if (this.options.fly)   {
+            if (bbox) this.flyToBounds(bbox);
+            else this.flyTo(latlng);
+        } else  {
+            if (bbox) this.fitBounds(bbox);
+            else this.panTo(latlng);
+        }
     },
 });

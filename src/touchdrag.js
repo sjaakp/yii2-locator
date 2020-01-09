@@ -14,7 +14,7 @@
 // https://github.com/elmarquis/Leaflet.GestureHandling
 
 L.TouchDragHandler = L.Handler.extend({
-    addHooks: function() {
+    addHooks() {
         this._map.dragging.disable();
         if (this._map.tap) {
             this._map.tap.disable();
@@ -24,7 +24,7 @@ L.TouchDragHandler = L.Handler.extend({
         L.DomEvent.on(this._map._container, 'click', this._handleTouch, this);
     },
 
-    removeHooks: function() {
+    removeHooks() {
         this._map.dragging.enable();
         if (this._map.tap) {
             this._map.tap.enable();
@@ -34,7 +34,7 @@ L.TouchDragHandler = L.Handler.extend({
         L.DomEvent.off(this._map._container, 'click', this._handleTouch, this);
     },
 
-    _handleTouch: function(e) {
+    _handleTouch(e) {
         if (e.type === 'touchstart' && e.touches.length === 1)  {
             L.DomUtil.addClass(e.target, 'leaflet-touchdrag');
             this._map.dragging.disable();
