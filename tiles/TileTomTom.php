@@ -20,7 +20,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Class TileTomTom
  * @package sjaakp\locator\tiles
- * use: tileLayer([ 'TomTom', 'apiKey' => '... your Api Key ...' ])
+ * use: tileLayer([ 'TomTom', 'key' => '... your Api Key ...' ])
  * @link https://developer.tomtom.com/maps-api
  */
 class TileTomTom extends BaseTile
@@ -39,13 +39,10 @@ class TileTomTom extends BaseTile
         }
         $scheme = strtolower($v);
 
-        $apiKey = ArrayHelper::remove($data, 'apiKey');
+        $apiKey = ArrayHelper::remove($data, 'key');
         if (! $apiKey)  {
-            throw new InvalidConfigException("Locator: apiKey for provider 'TomTom' is not set.");
+            throw new InvalidConfigException("Locator: key for provider 'TomTom' is not set.");
         }
-
-        $minZ = $scheme == 'watercolor' ? 1 : 0;
-        $maxZ = $scheme == 'watercolor' ? 16 : (strncmp($scheme, 'terrain', 7) == 0 ? 18 : 20);
 
         $year = date('Y');
 

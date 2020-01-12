@@ -49,9 +49,10 @@ L.geo = {
 
 /**
  * @link https://nominatim.org/release-docs/develop/api/Search/
- * Doesn't support suggestions
  */
 L.geo.Nominatim = L.geo.Geocoder.extend({
+    url: 'https://nominatim.openstreetmap.org/',
+
     mark(place) {
         const latlng = L.latLng(place.lat, place.lon),
             bb = place.boundingbox,
@@ -59,9 +60,36 @@ L.geo.Nominatim = L.geo.Geocoder.extend({
         this.placeMarker(latlng, bbox);
     },
 
+    search(address) {
+        const url = this.constructUrl(this.url + 'search', { format: 'json', q: address });
+        return this.fetchJson(url)
+    },
+
+    suggest(address, datalist)    {
+        // const url = this.constructUrl(this.url + 'search', { format: 'json', q: address });
+        this.search(address)
+            .then(json => {
+                // console.log(json);
+                datalist.innerHTML = json.reduce((a, v) => a + `<option data-id="${v.osm_type.charAt(0).toUpperCase()}${v.osm_id}">${v.display_name}</option>`, '');
+            })
+            .catch(error => this.fire(error));
+    },
+
+    lookup(id)  {
+        const url = this.constructUrl(this.url + 'reverse', {
+            format: 'json',
+            osm_type: id.charAt(0),
+            osm_id: id.slice(1)
+        });
+        this.fetchJson(url)
+            .then(json => this.mark(json))
+            .catch(error => this.fire(error));
+    },
+
     geocode(address)    {
-        fetch('//nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(address))
-            .then(response => response.json())
+        // fetch('//nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(address))
+        //     .then(response => response.json())
+        this.search(address)
             .then(json => {
                 if (json.length < 1) throw('notfound');
                 return json[0];
@@ -184,9 +212,9 @@ L.geo.TomTom = L.geo.Geocoder.extend({
         this.placeMarker(latlng, bbox);
     },
 
-    fetchResults(address)  {
+    fetchResults(address, options = {})  {
         const query = encodeURIComponent(address),
-            url = this.constructUrl(`${this.url}${query}.json`, { typeahead: true });
+            url = this.constructUrl(`${this.url}${query}.json`, options);
 
         return this.fetchJson(url)
             .then(json => {
@@ -197,7 +225,7 @@ L.geo.TomTom = L.geo.Geocoder.extend({
 
     suggest(address, datalist)  {
         this.datalist = datalist;
-        this.fetchResults(address)
+        this.fetchResults(address,{ typeahead: true })
             .then(results => {
                 this.suggestions = results;
                 datalist.innerHTML = results.reduce((a, v) => a + `<option data-id="${v.id}">${v.address.freeformAddress}</option>`, '');
@@ -267,25 +295,28 @@ L.geo.Kadaster = L.geo.Geocoder.extend({
     }
 });
 
-L.Map.include({
-    find(address) {
-        this._geocoder.geocode(address);
-        return this;
+L.Search = L.Control.extend({
+    initialize(options) {
+        L.setOptions(this, options || {});
     },
 
-    initFinder(buttonId, inputId, datalistId)   {
-        const input = document.getElementById(inputId);
-        const datalist = document.getElementById(datalistId);
-        input.addEventListener('input', function(e) {
+    onAdd(map)  {
+        const datalistId = map.getContainer().id + '_dl';
+        const container = L.DomUtil.create('div', 'locator-search');
+        const input = L.DomUtil.create('input', null, container);
+        input.type = 'text';
+        input.setAttribute('list', datalistId);
+        L.DomEvent.on(input, 'input', function (e) {
             const v = e.target.value;
             if (v.length >= 2)  {
                 this._geocoder.suggest(e.target.value, datalist);
             }
-        }.bind(this));
-        input.addEventListener('change', function(e) {
+        }, map);
+        L.DomEvent.on(input, 'change', function (e) {
             const val = e.target.value,
                 opts = datalist.childNodes;
             e.target.value = '';
+            container.classList.remove('open');
             for (let i = 0; i < opts.length; i++) {
                 if (val.startsWith(opts[i].innerText)) {
                     this._geocoder.lookup(opts[i].dataset.id);
@@ -293,16 +324,50 @@ L.Map.include({
                 }
             }
             this.find(val);
-        }.bind(this));
+        }, map);
+        const button = L.DomUtil.create('button', null, container);
+        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>';
+        button.title = 'Search';
+        L.DomEvent.on(button, 'click', function(e) {
+            e.preventDefault();
+            this.toggle();
+        }, this);
+        const datalist = L.DomUtil.create('datalist', null, container);
+        datalist.id = datalistId;
+        return container;
+    },
+
+    toggle()  {
+        const c = this.getContainer(),
+            cc = c.classList,
+            bOpen = cc.contains('open');
+        cc.toggle('open');
+        if (! bOpen)  {
+            c.children[0].focus();
+        }
+    },
+});
+
+L.search = function(options) {
+    return new L.Search(options);
+};
+
+L.Map.include({
+    find(address) {
+        this._geocoder.geocode(address);
         return this;
     },
 
-    initGeocoder(name, options)  {
+    geocoder(name, options)  {
         this._geocoder = new L.geo[name](this, options);
         return this;
+    },
+
+    finder(options)  {
+        this.addControl(L.search(options));
     }
 });
 
 L.Map.addInitHook(function() {
-    this.initGeocoder('Nominatim', {});
+    this.geocoder('Nominatim', {});
 });

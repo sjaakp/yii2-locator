@@ -43,6 +43,7 @@
     @link http://www.liedman.net/tiled-maps/ - The Hitchhacker’s Guide To Tiled Maps
  */
 
+import './locator.scss';
 import './touchdrag.js';
 import './dotmarker.js';
 import './spritemarker.js';

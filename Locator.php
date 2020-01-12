@@ -321,33 +321,20 @@ class Locator extends Widget   {
             throw new InvalidConfigException("Locator: '$name' is unknown geocoder.");
         }
         $options = Json::encode($options);
-        $this->_js[] = ".initGeocoder('$name', $options)";
+        $this->_js[] = ".geocoder('$name', $options)";
         return $this;
     }
 
     /**
-     * @param array $options
      * @param null $geocoder
-     * @return $this
+     * @param string $position 'topleft', 'topright', 'bottomleft' or 'bottomright'
+     * @return Locator
      * @throws InvalidConfigException
      */
-    public function finder($options = [], $geocoder = null)
+    public function finder($geocoder = null, $position = 'topright')
     {
         if ($geocoder) $this->geocoder($geocoder);
-        $inputOptions = ArrayHelper::remove($options, 'inputOptions', []);
-        $buttonOptions = ArrayHelper::remove($options, 'buttonOptions', []);
-        $buttonLabel = ArrayHelper::remove($buttonOptions, 'label', 'Find');
-        $id = $this->getId();
-        $inputId = $id . '_fi';
-        $buttonId = $id . '_fb';
-        $datalistId = $id . '_fd';
-        $inputOptions['id'] = $inputId;
-        $inputOptions['list'] = $datalistId;
-        $buttonOptions['id'] = $buttonId;
-        $this->_html[] = Html::textInput($inputId, '', $inputOptions);
-        $this->_html[] = Html::button($buttonLabel, $buttonOptions);
-        $this->_html[] = Html::tag('datalist', '', [ 'id' => $datalistId ]);
-        $this->_js[] = ".initFinder('$buttonId','$inputId','$datalistId')";
+        $this->_js[] = ".finder({position:'$position'})";
         return $this;
     }
 
@@ -402,8 +389,6 @@ class Locator extends Widget   {
         $opts = str_replace('[]', '{}', Json::encode(array_merge($this->defaultOptions, $this->leafletOptions)));
         $call = "window.$var=L.map('$id', $opts)";
         array_unshift($this->_js, $call);
-
-        $view->registerCss('.sprite-marker{display:flex;align-items:center;justify-content:center;color:var(--fa-secondary-color);}');
 
         $view->registerJs(implode('', $this->_js) . ';');
         echo implode('', $this->_html);
