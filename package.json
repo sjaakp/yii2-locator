@@ -28,7 +28,8 @@
   },
   "homepage": "https://github.com/sjaakp/yii2-locator#readme",
   "dependencies": {
-    "core-js": "^3.6.3"
+    "core-js": "^3.6.3",
+    "lodash.debounce": "^4.0.8"
   },
   "devDependencies": {
     "@rollup/plugin-buble": "^0.21.0",

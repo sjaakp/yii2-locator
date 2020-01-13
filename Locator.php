@@ -51,19 +51,17 @@ class Locator extends Widget   {
     public $leafletOptions = [];
 
     /**
-     * @var null|array options for MarkerClusterer
+     * @var null|true|array options for MarkerClusterer
      * if null: no clustering
-     * [] (empty array): cluster with default options
+     * true|[] (empty array): cluster with default options
      * @link https://github.com/Leaflet/Leaflet.markercluster#options
      */
     public $cluster;
 
     /**
-     * @var null|array options for popup
+     * @var null|true|array options for popup
      * if null: no popup
-     * [] (empty array): popup with default options
-     * popup has one extra option:
-     *      - 'loading': the HTML shown while loading; default: '<i class="far fa-spinner fa-spin fa-lg"></i>'
+     * true|[] (empty array): popup with default options
      * @link https://leafletjs.com/reference-1.6.0.html#popup-option
      */
     public $popup;
@@ -299,6 +297,8 @@ class Locator extends Widget   {
         return $this->modelMarker($model, $attribute, $options);
     }
 
+    protected $_search = false;
+
     /**
      * @param $options
      * @return $this
@@ -320,6 +320,7 @@ class Locator extends Widget   {
         {
             throw new InvalidConfigException("Locator: '$name' is unknown geocoder.");
         }
+        $this->_search = true;
         $options = Json::encode($options);
         $this->_js[] = ".geocoder('$name', $options)";
         return $this;
@@ -334,6 +335,7 @@ class Locator extends Widget   {
     public function finder($geocoder = null, $position = 'topright')
     {
         if ($geocoder) $this->geocoder($geocoder);
+        $this->_search = true;
         $this->_js[] = ".finder({position:'$position'})";
         return $this;
     }
@@ -348,10 +350,6 @@ class Locator extends Widget   {
         else $this->options['id'] = $this->getId();
 
         Html::addCssClass($this->options, 'locator');
-
-        if (is_array($this->popup) && ! isset($this->popup['loading'])) {
-            $this->popup['loading'] = '<i class="fas fa-spinner fa-spin fa-lg"></i>';
-        }
 
         if ($this->height !== false) {
             $style = '';
@@ -371,11 +369,15 @@ class Locator extends Widget   {
         $asset = LeafletAsset::register($view);
 
         if (! is_null($this->cluster))    {
-            $pop = array_pop($asset->js);       // ensure our js comes after markercluster.js
+//            $pop = array_pop($asset->js);       // ensure our js comes after markercluster.js
             $asset->js[] = '//unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js';
-            array_push($asset->js, $pop);
+//            array_push($asset->js, $pop);
             $asset->css[] = '//unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css';
             $asset->css[] = '//unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css';
+        }
+
+        if ($this->_search) {
+            $asset->js[] = '//unpkg.com/@sjaakp/leaflet-search@1.0.0/dist/leaflet-search.js';
         }
 
         $id = $this->getId();

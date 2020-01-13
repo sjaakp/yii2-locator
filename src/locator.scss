@@ -5,6 +5,7 @@
   justify-content:center;
   color:var(--fa-secondary-color);
 }
+/*
 
 .locator-search {
   border-radius: 4px;
@@ -31,4 +32,19 @@
       background-color: #ddd;
     }
   }
+}
+*/
+
+@keyframes locator-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.locator-loading {
+  width: 1.5em;
+  animation: locator-spin 2s infinite linear;
 }
