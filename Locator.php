@@ -111,6 +111,11 @@ class Locator extends Widget   {
     public $tile = 'OpenStreetMap';
 
     /**
+     * @var string namespace of the Tile* classes
+     */
+    public $tileNamespace = 'sjaakp\locator\tiles';
+
+    /**
      * @param string | array $data @see tile
      * @return $this
      * @throws InvalidConfigException
@@ -125,7 +130,7 @@ class Locator extends Widget   {
 
             try {
                 $tileObject = Yii::createObject([
-                    'class' => "sjaakp\locator\\tiles\Tile$name",
+                    'class' => "{$this->tileNamespace}\Tile$name",
                     'variant' => $variant
                 ]);
             }
@@ -165,7 +170,7 @@ class Locator extends Widget   {
 
     /** @param $model Model
      * Set map center to value of $attribute in $model; should be a GeoJSON Feature.
-     * @link http://geojson.org/geojson-spec.html#feature-objects
+     * @link https://geojson.org/geojson-spec.html#feature-objects
      * @return $this
      */
     public function modelCenter($model, $attribute) {
@@ -303,7 +308,7 @@ class Locator extends Widget   {
      * @param $options
      * @return $this
      * @throws InvalidConfigException
-     * - Nominatim: $options = 'Nominatim' (doesn't support autocomplete)
+     * - Nominatim: $options = 'Nominatim'
      * - GeoNames: $options = [ 'GeoNames', 'username' => '...', 'maxRows' => 20, ... ]
      * - Here: $options = [ 'Here', 'apiKey' => '...', 'maxresults' => 20, ... ]
      * - TomTom: $options = [ 'TomTom', 'key' => '...', 'limit' => 20 ]
@@ -322,7 +327,7 @@ class Locator extends Widget   {
         }
         $this->_search = true;
         $options = Json::encode($options);
-        $this->_js[] = ".geocoder('$name', $options)";
+        $this->_js[] = ".setGeocoder('$name', $options)";
         return $this;
     }
 
@@ -336,8 +341,12 @@ class Locator extends Widget   {
     {
         if ($geocoder) $this->geocoder($geocoder);
         $this->_search = true;
-        $this->_js[] = ".finder({position:'$position'})";
+        $this->_js[] = ".addControl(L.control.search({position:'$position'}))";
         return $this;
+    }
+
+    public function getVar()    {
+        return 'locator' . str_replace('-', '_', $this->getId());
     }
 
     /**
@@ -369,19 +378,17 @@ class Locator extends Widget   {
         $asset = LeafletAsset::register($view);
 
         if (! is_null($this->cluster))    {
-//            $pop = array_pop($asset->js);       // ensure our js comes after markercluster.js
-            $asset->js[] = '//unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js';
-//            array_push($asset->js, $pop);
-            $asset->css[] = '//unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css';
-            $asset->css[] = '//unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css';
+            $asset->js[] = '//unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js';
+            $asset->css[] = '//unpkg.com/leaflet.markercluster/dist/MarkerCluster.css';
+            $asset->css[] = '//unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css';
         }
 
         if ($this->_search) {
-            $asset->js[] = '//unpkg.com/@sjaakp/leaflet-search@1.0.0/dist/leaflet-search.js';
+            $asset->js[] = '//unpkg.com/@sjaakp/leaflet-search/dist/leaflet-search.js';
         }
 
         $id = $this->getId();
-        $var = 'locator' . str_replace('-', '_', $id);
+        $var = $this->getVar();
 
         foreach([ 'marker', 'cluster', 'popup', 'scale', 'urlTemplate', 'fly' ] as $prop)
         {
@@ -392,7 +399,7 @@ class Locator extends Widget   {
         $call = "window.$var=L.map('$id', $opts)";
         array_unshift($this->_js, $call);
 
-        $view->registerJs(implode('', $this->_js) . ';');
+        $view->registerJs(implode('', $this->_js) . ";$var.options.createMarker=(e,t)=>$var.newMarker(e,t);");
         echo implode('', $this->_html);
     }
 

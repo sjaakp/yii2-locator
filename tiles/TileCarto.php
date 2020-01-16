@@ -30,9 +30,9 @@ class TileCarto extends BaseTile
     public function run($data)
     {
         $schemes = [
-            'light' => 'light_all',
-            'dark' => 'dark_all',
-            'voyager' => 'rastertiles/voyager',
+            'Light' => 'light_all',
+            'Dark' => 'dark_all',
+            'Voyager' => 'rastertiles/voyager',
         ];
 
         $v = $this->variant ? $this->variant : 'light';

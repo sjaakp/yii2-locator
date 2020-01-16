@@ -33,5 +33,6 @@ class BaseTile extends BaseObject
     }
 
     protected $osmAttr = '&copy; <a href="//openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>';
+    protected $odbL = '&copy; <a href="//openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">ODbL</a>';
     protected $ccAttr = '<a href="//creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener noreferrer">CC-BY-SA</a>';
 }

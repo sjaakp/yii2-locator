@@ -54,7 +54,8 @@ class TileStamen extends BaseTile
         $maxZ = $scheme == 'watercolor' ? 16 : (strncmp($scheme, 'terrain', 7) == 0 ? 18 : 20);
 
         $opts = array_merge([
-            'attribution' => "Map tiles by <a href=\"//stamen.com\" target=\"_blank\" rel=\"noopener noreferrer\">Stamen Design</a>, $this->ccAttr &mdash; Map data $this->osmAttr",
+            'attribution' => "Map tiles by <a href=\"//stamen.com\" target=\"_blank\" rel=\"noopener noreferrer\">Stamen Design</a> &mdash; Map data $this->osmAttr, "
+                . ($scheme == 'watercolor' ? $this->ccAttr : $this->odbL),
             'minZoom' => $minZ,
             'maxZoom' => $maxZ,
             'subdomains' => 'abcd',

@@ -13,7 +13,7 @@
 /*
     Plugin for Leaflet
     Tested with Leaflet 1.6.0
-    21-05-2018 ... 29-12-2019
+    21-05-2018 ... 14-01-2020
 
     Map has extra options:
         marker      Plain object, options used for creating markers
@@ -122,7 +122,14 @@ L.Map.include({
         }).fire('moveend');
     },
 
-    newMarker(latlng, options) {      // create a new marker of any type
+    /**
+     * Create a new marker of any type
+     * @param latlng
+     * @param options if null, use this.options.marker
+     * @returns {*}
+     */
+    newMarker(latlng, options = null) {
+        if (options == null) options = this.options.marker;
         const type = options.type || 'Marker';
         if (type === 'Marker' && options.icon)  {
             options.icon = L.icon(options.icon);
@@ -168,21 +175,5 @@ L.Map.include({
         this._marker = m;
         m.fire('moveend');
         return this;
-    },
-
-    placeMarker(latlng, bbox)   {
-        if (this._marker)    {
-            this._marker.setLatLng(latlng);
-        }
-        else {
-            this.disarm().addMarker(latlng, this.options.marker);
-        }
-        if (this.options.fly)   {
-            if (bbox) this.flyToBounds(bbox);
-            else this.flyTo(latlng);
-        } else  {
-            if (bbox) this.fitBounds(bbox);
-            else this.panTo(latlng);
-        }
-    },
+    }
 });
