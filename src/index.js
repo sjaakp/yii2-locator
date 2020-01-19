@@ -172,7 +172,7 @@ L.Map.include({
     addMarker(latlng, markerOpts)  {
         const m = this.newMarker(latlng, markerOpts);
         this.addLayer(m);
-        this._marker = m;
+        this.marker = m;
         m.fire('moveend');
         return this;
     }
