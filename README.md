@@ -255,7 +255,8 @@ so it inherits all of its properties.
 **Locator** retrieves its map tiles from a tile provider or map provider. Tiles are identified by the name
 of the provider, or by an `array` with the name as the first item and options in the rest
 of the array. This value is used in the `$tile` property, and in the `tileLayer()` method.
-A map can have more than one tile layers, which make sense if they are partly transparent.
+A map can have more than one tile layers, which make sense if they are partly transparent,
+like the tiles from *OpenSeaMap*.
 
 Some providers offer tiles in a few *variants*. They are indicated with a suffix to the
 provider name, seperated by a dot. For example: `'OpenStreetMap'` and `'OpenStreetMap.BlackAndWhite'`.
@@ -272,13 +273,14 @@ may be more in the future):
 |[OpenStreetMap](https://www.openstreetmap.org/about)|BlackAndWhite, HOT| |
 |OpenMapSurfer|Roads, Hybrid, AdminBounds, ContourLines, Hillshade| |
 |[OpenTopoMap](https://opentopomap.org/about#verwendung)| | |
+|[OpenSeaMap](https://openseamap.org)| | |
 |[Wikimedia](https://commons.wikimedia.org/wiki/Commons:Map_resources)| | |
 |[Carto](https://github.com/CartoDB/basemap-styles)|Light, Dark, Voyager| |
 |[Stamen](http://maps.stamen.com)|Toner, TonerBackground, TonerHybrid, TonerLines, TonerLabels, TonerLite, Watercolor, Terrain, TerrainBackground, TerrainLabels| |
 |EsriWorld| | |
 |[Here](https://developer.here.com)|lots (see TileHere.php) |`[ 'apiKey' => '...' ]`|
 |[TomTom](https://developer.tomtom.com/maps-api)|Basic, Hybrid, Labels|`[ 'key' => '...' ]`|
-|[Kadaster](https://pdok-ngr.readthedocs.io/services.html#tile-map-service-tms) (Netherlands only)| | |
+|[Kadaster](https://pdok-ngr.readthedocs.io/services.html#tile-map-service-tms) (Netherlands only)|grijs, pastel| |
 |[Amsterdam](https://map.data.amsterdam.nl/)|light, zw| |
 
 If `$tile` is not set, **Locator** uses tiles from *OpenStreetMap*.
@@ -331,7 +333,4 @@ radius and always has (at least) the class name `'dot-marker'`. The default mark
 A marker with a [DivIcon](https://leafletjs.com/reference.html#divicon). Use this to display 
 [FontAwesome](https://fontawesome.com) markers like so:
  
-    $map->marker = [ 'type' => 'SpriteMarker', 'className' => 'far fa-2x fa-dog' ]
-
-
-
+    $map->marker = [ 'type' => 'SpriteMarker', 'html' => '<i class="far fa-2x fa-dog"></i>' ]
