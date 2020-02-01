@@ -56,6 +56,7 @@ L.Map.addInitHook(function() {
         this.addControl(L.control.scale({ metric: metric, imperial: imperial }));    // add scale control
     }
     if (this.options.touchdrag) this.addHandler('touchdrag', L.TouchDragHandler);       // and touchdrag handler
+    this.on('geofound', e => { this.disarm(); }, this);
 });
 
 
