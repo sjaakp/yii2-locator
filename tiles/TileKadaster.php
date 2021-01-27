@@ -3,7 +3,7 @@
  * sjaakp/yii2-locator
  * ----------
  * Leaflet wrapper for Yii2 framework
- * Version 1.0.0
+ * Version 1.0.3 TMS => WMTS
  * Copyright (c) 2020
  * Sjaak Priester, Amsterdam
  * MIT License
@@ -21,6 +21,7 @@ use yii\base\InvalidConfigException;
  * @package sjaakp\locator\tiles
  * Netherlands
  * @link https://pdok-ngr.readthedocs.io/services.html#tile-map-service-tms
+ * @link https://www.pdok.nl/introductie/-/article/basisregistratie-topografie-achtergrondkaarten-brt-a-
  */
 class TileKadaster extends BaseTile
 {
@@ -38,13 +39,17 @@ class TileKadaster extends BaseTile
         }
 
         $opts = array_merge([
-            'tms' => true,
-            'zoomOffset' => -1,
-            'minZoom' => 7,
+            'minZoom' => 5,
             'maxZoom' => 19,
             'boundVec' => [[50.5, 0.0], [54, 10.4]],
             'attribution' => "&copy; <a href=\"//kadaster.nl\" target=\"_blank\" rel=\"noopener noreferrer\">Kadaster</a> ($this->ccAttr)",
         ], $data);
-        return $this->encode("//geodata.nationaalgeoregister.nl/tiles/service/tms/1.0.0/brtachtergrondkaart$v/EPSG:3857/{z}/{x}/{y}.png", $opts);
+        return $this->encode("https://geodata.nationaalgeoregister.nl/tiles/service/wmts?service=WMTS&version=1.0.0&layer=brtachtergrondkaart$v&tilematrixset=EPSG:3857&format=image/png&request=GetTile&tilematrix={z}&tilerow={y}&tilecol={x}", $opts);
+
+//      Sample with aerial photo, works
+//        return $this->encode("https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0?service=WMTS&version=1.0.0&layer=Actueel_ortho25&tilematrixset=EPSG:3857&format=image/jpeg&request=GetTile&tilematrix={z}&tilerow={y}&tilecol={x}", $opts);
+
+//      This also works but it seems undocumented. Found on https://github.com/geppyz/leaflet-test-map
+//        return $this->encode("//geodata.nationaalgeoregister.nl/tiles/service/wmts/brtachtergrondkaart$v/EPSG:3857/{z}/{x}/{y}.png", $opts);
     }
 }
