@@ -51,6 +51,6 @@ class TileTomTom extends BaseTile
             'subdomains' => 'abcd',
             'attribution' => "<a href=\"//tomtom.com\" target=\"_blank\" rel=\"noopener noreferrer\">&copy;  1992-$year TomTom.</a>",
         ], $data);
-        return $this->encode("https://{s}.api.tomtom.com/map/1/tile/$scheme/main/{z}/{x}/{y}.png?key=$apiKey", $opts);
+        return $this->encode("https://{s}.api.tomtom.com/map/1/tile/$scheme/tow/{z}/{x}/{y}.png?key=$apiKey", $opts);
     }
 }

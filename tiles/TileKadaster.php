@@ -22,6 +22,8 @@ use yii\base\InvalidConfigException;
  * Netherlands
  * @link https://pdok-ngr.readthedocs.io/services.html#tile-map-service-tms
  * @link https://www.pdok.nl/introductie/-/article/basisregistratie-topografie-achtergrondkaarten-brt-a-
+ *
+ * 31-10-2021: url updated, 'standaard' and 'water' added
  */
 class TileKadaster extends BaseTile
 {
@@ -31,7 +33,7 @@ class TileKadaster extends BaseTile
      */
     public function run($data)
     {
-        $variants = [ 'grijs', 'pastel' ];
+        $variants = [ 'standaard', 'grijs', 'pastel', 'water' ];
 
         $v = $this->variant;
         if (! $v && in_array($v, $variants))        {
@@ -44,7 +46,8 @@ class TileKadaster extends BaseTile
             'boundVec' => [[50.5, 0.0], [54, 10.4]],
             'attribution' => "&copy; <a href=\"//kadaster.nl\" target=\"_blank\" rel=\"noopener noreferrer\">Kadaster</a> ($this->ccAttr)",
         ], $data);
-        return $this->encode("https://geodata.nationaalgeoregister.nl/tiles/service/wmts?service=WMTS&version=1.0.0&layer=brtachtergrondkaart$v&tilematrixset=EPSG:3857&format=image/png&request=GetTile&tilematrix={z}&tilerow={y}&tilecol={x}", $opts);
+//        return $this->encode("https://geodata.nationaalgeoregister.nl/tiles/service/wmts?service=WMTS&version=1.0.0&layer=brtachtergrondkaart$v&tilematrixset=EPSG:3857&format=image/png&request=GetTile&tilematrix={z}&tilerow={y}&tilecol={x}", $opts);
+        return $this->encode("https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0?service=wmts&version=2.0&layer=$v&tilematrixset=EPSG:3857&format=image/png&request=GetTile&tilematrix={z}&tilerow={y}&tilecol={x}", $opts);
 
 //      Sample with aerial photo, works
 //        return $this->encode("https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0?service=WMTS&version=1.0.0&layer=Actueel_ortho25&tilematrixset=EPSG:3857&format=image/jpeg&request=GetTile&tilematrix={z}&tilerow={y}&tilecol={x}", $opts);
