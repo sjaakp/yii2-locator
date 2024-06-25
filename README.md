@@ -268,20 +268,20 @@ Out of the box, **Locator** supports several tile providers. They each have a PH
 in the `src/tiles` directory. Currently, the following tile providers are supported (there
 may be more in the future):
 
-|Name|Variants|Required option|
-|----|---|--------|
-|[OpenStreetMap](https://www.openstreetmap.org/about)|BlackAndWhite, HOT| |
-|OpenMapSurfer|Roads, Hybrid, AdminBounds, ContourLines, Hillshade| |
-|[OpenTopoMap](https://opentopomap.org/about#verwendung)| | |
-|[OpenSeaMap](https://openseamap.org)| | |
-|[Wikimedia](https://commons.wikimedia.org/wiki/Commons:Map_resources)| | |
-|[Carto](https://github.com/CartoDB/basemap-styles)|Light, Dark, Voyager| |
-|[Stamen](http://maps.stamen.com)|Toner, TonerBackground, TonerHybrid, TonerLines, TonerLabels, TonerLite, Watercolor, Terrain, TerrainBackground, TerrainLabels| |
-|EsriWorld| | |
-|[Here](https://developer.here.com)|lots (see TileHere.php) |`[ 'apiKey' => '...' ]`|
-|[TomTom](https://developer.tomtom.com/maps-api)|Basic, Hybrid, Labels|`[ 'key' => '...' ]`|
-|[Kadaster](https://pdok-ngr.readthedocs.io/services.html#tile-map-service-tms) (Netherlands only)|standaard, grijs, pastel, water| |
-|[Amsterdam](https://map.data.amsterdam.nl/)|light, zw| |
+| Name                                                                                              | Variants                                                                                                          |Required option|
+|---------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|--------|
+| [OpenStreetMap](https://www.openstreetmap.org/about)                                              | BlackAndWhite, HOT                                                                                                | |
+| OpenMapSurfer                                                                                     | Roads, Hybrid, AdminBounds, ContourLines, Hillshade                                                               | |
+| [OpenTopoMap](https://opentopomap.org/about#verwendung)                                           |                                                                                                                   | |
+| [OpenSeaMap](https://openseamap.org)                                                              |                                                                                                                   | |
+| [Wikimedia](https://commons.wikimedia.org/wiki/Commons:Map_resources) (affiliated sites)          |                                                                                                                   | |
+| [Carto](https://github.com/CartoDB/basemap-styles)                                                | Light, Dark, Voyager                                                                                              | |
+| [Stamen](http://maps.stamen.com)                                                                  | Toner, TonerBackground, TonerLines, TonerLabels, TonerLite, Watercolor, Terrain, TerrainBackground, TerrainLabels | |
+| EsriWorld                                                                                         |                                                                                                                   | |
+| [Here](https://developer.here.com)                                                                | lots (see TileHere.php)                                                                                           |`[ 'apiKey' => '...' ]`|
+| [TomTom](https://developer.tomtom.com/maps-api)                                                   | Basic, Hybrid, Labels                                                                                             |`[ 'key' => '...' ]`|
+| [Kadaster](https://pdok-ngr.readthedocs.io/services.html#tile-map-service-tms) (Netherlands only) | standaard, grijs, pastel, water                                                                                   | |
+| [Amsterdam](https://map.data.amsterdam.nl/)                                                       | light, zw                                                                                                         | |
 
 If `$tile` is not set, **Locator** uses tiles from *OpenStreetMap*.
 

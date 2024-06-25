@@ -9,6 +9,7 @@
  * MIT License
  * https://github.com/sjaakp/yii2-locator
  * https://sjaakpriester.nl
+ * https://s3.amazonaws.com/long-term.cache.maps.stamen.com/watercolor/2/3/1.jpg
  */
 
 namespace sjaakp\locator\tiles;
@@ -31,7 +32,6 @@ class TileStamen extends BaseTile
         $schemes = [
             'Toner' => 'toner',
             'TonerBackground' => 'toner-background',
-            'TonerHybrid' => 'toner-hybrid',
             'TonerLines' => 'toner-lines',
             'TonerLabels' => 'toner-labels',
             'TonerLite' => 'toner-lite',
@@ -48,7 +48,8 @@ class TileStamen extends BaseTile
         $scheme = $schemes[$v];
 
         $ext = $scheme == 'watercolor' ? 'jpg' : 'png';
-        $url = "https://stamen-tiles-{s}.a.ssl.fastly.net/$scheme/{z}/{x}/{y}.$ext";
+        $url = "https://tiles.stadiamaps.com/tiles/stamen_$scheme/{z}/{x}/{y}{r}.$ext";
+//        $url = "https://stamen-tiles-{s}.a.ssl.fastly.net/$scheme/{z}/{x}/{y}.$ext";
 
         $minZ = $scheme == 'watercolor' ? 1 : 0;
         $maxZ = $scheme == 'watercolor' ? 16 : (strncmp($scheme, 'terrain', 7) == 0 ? 18 : 20);
